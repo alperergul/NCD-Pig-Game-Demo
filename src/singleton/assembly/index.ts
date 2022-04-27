@@ -1,20 +1,22 @@
-import { storage, Context } from "near-sdk-core"
+import { storage, Context } from "near-sdk-core";
 
 @nearBindgen
 export class Contract {
-  private message: string = 'hello world'
+  private message: string = "hello world";
 
   // return the string 'hello world'
   helloWorld(): string {
-    return this.message
+    return this.message;
   }
 
   // read the given key from account (contract) storage
   read(key: string): string {
     if (isKeyInStorage(key)) {
-      return `✅ Key [ ${key} ] has value [ ${storage.getString(key)!} ] and "this.message" is [ ${this.message} ]`
+      return `✅ Key [ ${key} ] has value [ ${storage.getString(
+        key
+      )!} ] and "this.message" is [ ${this.message} ]`;
     } else {
-      return `🚫 Key [ ${key} ] not found in storage. ( ${this.storageReport()} )`
+      return `🚫 Key [ ${key} ] not found in storage. ( ${this.storageReport()} )`;
     }
   }
 
@@ -34,15 +36,14 @@ export class Contract {
    */
   @mutateState()
   write(key: string, value: string): string {
-    storage.set(key, value)
-    this.message = 'data was saved' // this is why we need the deorator @mutateState() above the method name
-    return `✅ Data saved. ( ${this.storageReport()} )`
+    storage.set(key, value);
+    this.message = "data was saved"; // this is why we need the deorator @mutateState() above the method name
+    return `✅ Data saved. ( ${this.storageReport()} )`;
   }
-
 
   // private helper method used by read() and write() above
   private storageReport(): string {
-    return `storage [ ${Context.storageUsage} bytes ]`
+    return `storage [ ${Context.storageUsage} bytes ]`;
   }
 }
 
@@ -64,5 +65,5 @@ ERROR TS2339: Property 'contains' does not exist on type 'src/singleton/assembly
  * @returns boolean indicating whether key exists
  */
 function isKeyInStorage(key: string): bool {
-  return storage.hasKey(key)
+  return storage.hasKey(key);
 }
