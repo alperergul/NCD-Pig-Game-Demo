@@ -27,6 +27,7 @@ export class Game {
   nextPlayer: Player;
   totalAmount: u128;
   creationAmount: u128;
+  winner: string;
 
   constructor() {
     this.id = context.blockIndex.toString().slice(2, 8);
@@ -38,6 +39,7 @@ export class Game {
     this.nextPlayer = this.player1;
     this.totalAmount = context.attachedDeposit;
     this.creationAmount = context.attachedDeposit;
+    this.winner = "";
   }
 }
 

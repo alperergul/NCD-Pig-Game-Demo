@@ -1,5 +1,9 @@
-- CREATE GAME | near call $CONTRACT createGame --accountId renbc.testnet --amount 1
-- VIEW GAME | near call $CONTRACT viewGame '{"id":"GAME_ID"}' --accountId renbc.testnet
-- JOIN GAME | near call $CONTRACT joinGame '{"id":"GAME_ID"}' --accountId badcracker.testnet --amount 1
-
-- 568510
+- $ near view $CONTRACT viewAllGames
+- $ near call $CONTRACT createGame --accountId renbc.testnet
+- $ near call $CONTRACT createGame --accountId renbc.testnet --amount 1
+- 726061
+- $ near view $CONTRACT viewGame '{"id":"727185"}'
+- $ near call $CONTRACT joinGame '{"id":"727185"}' --accountId badcracker.testnet --amount 1
+- $ near view $CONTRACT viewGame '{"id":"727185"}'
+- $ near call $CONTRACT rollDice '{"id":"727185"}' --accountId badcracker.testnet
+- $ near call $CONTRACT rollDice '{"id":"727185"}' --accountId renbc.testnet

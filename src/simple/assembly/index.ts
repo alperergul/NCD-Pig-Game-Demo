@@ -1,10 +1,6 @@
 import { logging, context, u128, RNG, ContractPromiseBatch } from "near-sdk-as";
 import { Game, games, GameState } from "./model";
 
-///////////////////
-//VIEW METHODS
-//////////////////
-
 //Return game which is its id is id
 export function viewGame(id: string): Game {
   return games.getSome(id);
@@ -15,15 +11,22 @@ export function viewAllGames(): Array<Game> {
   return games.values();
 }
 
+export function deleteCompletedGames(): string {
+  games.values().forEach((game: Game) => {
+    if (game.gameState == GameState.completed) {
+      games.delete(game.id);
+    }
+  });
+
+  return `Completed games deleted. ${games.length} game is in progress.`;
+}
+
 export function showScoreStatus(id: string): string {
   let game = games.getSome(id);
 
-  return `🚩 ${game.player1.id} -> ${game.player1.totalScore} vs 🚩 ${game.player2.id} -> ${game.player2.totalScore}`;
+  return `🚩${game.player1.id}: ${game.player1.totalScore} | 🚩${game.player2.id}: ${game.player2.totalScore}`;
 }
 
-///////////////////
-//CHANGE METHOD
-//////////////////
 export function createGame(): string {
   assert(
     context.attachedDeposit == u128.fromString("1000000000000000000000000"),
@@ -35,9 +38,6 @@ export function createGame(): string {
   return game.id;
 }
 
-///////////////////
-//PLAYER MOVE METHODS
-//////////////////
 export function joinGame(id: string): string {
   assert(games.contains(id), "Game does not exist!");
   assert(
@@ -68,8 +68,8 @@ export function rollDice(id: string): string {
   let currentPlayer =
     currentPlayerId == game.player1.id ? game.player1 : game.player2;
 
-  assert(game.nextPlayer.id == currentPlayerId, "❌ It is not your turn!");
   assert(game.gameState == GameState.inProgress, "⛔ Game is not in progress!");
+  assert(game.nextPlayer.id == currentPlayerId, "❌ It is not your turn!");
 
   let rng = new RNG<u8>(6, 6);
   let dice = rng.next() + 1;
@@ -87,8 +87,8 @@ export function rollDice(id: string): string {
     message = `${currentPlayerId}'s dice rolled ${dice}. It is still ${currentPlayerId} turn`;
   }
   games.set(game.id, game);
-
-  return message;
+  let turnScoreMessage = showTurnScores(currentPlayerId, game);
+  return message + turnScoreMessage;
 }
 
 export function holdScore(id: string): string {
@@ -119,16 +119,24 @@ export function holdScore(id: string): string {
   }
   games.set(game.id, game);
 
-  return message;
+  let totalScoreMessage = showTotalScores(game);
+
+  return message + totalScoreMessage;
 }
 
-///////////////////
-//HELPER METHODS
-//////////////////
 export function setNextPlayer(playerId: string, game: Game): void {
   game.nextPlayer = playerId == game.player1.id ? game.player2 : game.player1;
-  logging.log(game.nextPlayer.id);
   games.set(game.id, game);
+}
+
+export function showTotalScores(game: Game): string {
+  return ` | 🚩${game.player1.id}: ${game.player1.totalScore} vs 🚩${game.player2.id}: ${game.player2.totalScore}`;
+}
+
+export function showTurnScores(playerId: string, game: Game): string {
+  let player = game.player1.id == playerId ? game.player1 : game.player2;
+
+  return ` | 🚩${player.id}' turn score is ${player.turnScore}`;
 }
 
 export function finishGame(game: Game, player: string, score: number): string {
@@ -137,6 +145,8 @@ export function finishGame(game: Game, player: string, score: number): string {
   const amountToReceive = game.totalAmount;
 
   toWinner.transfer(amountToReceive);
+  game.winner = player;
+
   games.set(game.id, game);
-  return `🥳🎉 Congratulations ${player}! ${player}'s total score reached 10. ${player} received ${amountToReceive} NEAR!`;
+  return `🥳🎉 Congratulations ${player}! ${player}'s total score reached 10. ${player} received ${amountToReceive} yocto!`;
 }
