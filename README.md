@@ -2,6 +2,8 @@
 
 ## 🐷 Pig Game
 
+This project was created with [starter--near-sdk-as](https://github.com/Learn-NEAR/starter--near-sdk-as).
+
 This project is a game of chance. It is played with two players. Players must deposit 1 NEAR to create or join the game. The player who created the game starts and rolls dice. As long as the dice do not roll 1, the player continues to roll the dice.. If the dice rolls 1, the score collected during that turns is reset. Players can keep the score in their total score before the dice rolls 1, but the turn passes to the other player. The game continues in this way and whoever collects 10 points wins.
 
 ## 🚀 Clone and Build
